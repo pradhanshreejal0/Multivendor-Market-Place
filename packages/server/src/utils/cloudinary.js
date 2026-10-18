@@ -1,4 +1,5 @@
 import { v2 as cloudinary } from 'cloudinary';
+import { compressImage } from './imageCompressor.js';
 
 // Configure cloudinary if env vars are present
 if (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET) {
@@ -10,20 +11,28 @@ if (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && proce
 }
 
 export const uploadToCloudinary = async (fileBuffer, folder = 'zenithbazaar') => {
-  return new Promise((resolve, reject) => {
-    if (!process.env.CLOUDINARY_CLOUD_NAME) {
-      // Fallback mock upload if credentials aren't set yet
-      return resolve('https://via.placeholder.com/600x600?text=ZenithBazaar+Product');
-    }
+  try {
+    // Compress image before uploading to speed up loading and save storage bandwidth
+    const optimizedBuffer = await compressImage(fileBuffer, { maxWidth: 1200, maxHeight: 1200, quality: 80 });
 
-    const uploadStream = cloudinary.uploader.upload_stream(
-      { folder },
-      (error, result) => {
-        if (error) return reject(error);
-        resolve(result.secure_url);
+    return new Promise((resolve, reject) => {
+      if (!process.env.CLOUDINARY_CLOUD_NAME) {
+        // Fallback mock upload if credentials aren't set yet
+        return resolve('https://via.placeholder.com/600x600?text=ZenithBazaar+Product');
       }
-    );
 
-    uploadStream.end(fileBuffer);
-  });
+      const uploadStream = cloudinary.uploader.upload_stream(
+        { folder, format: 'jpg' },
+        (error, result) => {
+          if (error) return reject(error);
+          resolve(result.secure_url);
+        }
+      );
+
+      uploadStream.end(optimizedBuffer);
+    });
+  } catch (error) {
+    console.error('Cloudinary upload with compression error:', error);
+    throw error;
+  }
 };
