@@ -12,6 +12,8 @@ import { productRoutes } from './modules/products/product.routes.js';
 import { cartRoutes } from './modules/cart/cart.routes.js';
 import { orderRoutes } from './modules/orders/order.routes.js';
 import { paymentRoutes } from './modules/payments/payment.routes.js';
+import { adminRoutes } from './modules/admin/admin.routes.js';
+import { layoutRoutes } from './modules/layout/layout.routes.js';
 
 dotenv.config();
 
@@ -47,6 +49,8 @@ app.use('/api/v1/cart', cartRoutes);
 app.use('/api/v1/checkout', orderRoutes);
 app.use('/api/v1/orders', orderRoutes);
 app.use('/api/v1/payments', paymentRoutes);
+app.use('/api/v1/admin', adminRoutes);
+app.use('/api/v1/layout', layoutRoutes);
 app.use('/api/v1/categories', (req, res, next) => {
   req.url = '/categories';
   return productRoutes(req, res, next);
