@@ -7,6 +7,7 @@ import cookieParser from 'cookie-parser';
 import { connectDB } from './config/db.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { NotFoundError } from './utils/errors.js';
+import { authRoutes } from './modules/auth/auth.routes.js';
 
 dotenv.config();
 
@@ -34,6 +35,9 @@ app.use(cookieParser());
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
 });
+
+// API Routes
+app.use('/api/v1/auth', authRoutes);
 
 // Handle undefined routes
 app.all('*', (req, res, next) => {
