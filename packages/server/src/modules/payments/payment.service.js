@@ -144,7 +144,7 @@ export const paymentService = {
     }
   },
 
-  async verifyPayment(gateway, queryParams, bodyData) {
+  async verifyPayment(gateway, queryParams, bodyData, userId = null, userRole = null) {
     if (gateway === 'esewa') {
       // eSewa verification (via query params or callback data)
       const { oid, data, transaction_uuid, total_amount, transaction_code } = queryParams;
@@ -153,6 +153,10 @@ export const paymentService = {
       const payment = await Payment.findOne({ transactionId: tid });
       if (!payment) {
         throw new NotFoundError('Payment transaction not found');
+      }
+
+      if (userRole !== 'admin' && userId && payment.user.toString() !== userId.toString()) {
+        throw new BadRequestError('Unauthorized to verify this payment');
       }
 
       // If eSewa returned base64 encoded response (v2)
@@ -207,6 +211,10 @@ export const paymentService = {
         throw new NotFoundError('Payment transaction not found');
       }
 
+      if (userRole !== 'admin' && userId && payment.user.toString() !== userId.toString()) {
+        throw new BadRequestError('Unauthorized to verify this payment');
+      }
+
       if (status === 'Completed' || payment.status === 'pending') {
         payment.status = 'completed';
         payment.gatewayTransactionId = pidx || payment.gatewayTransactionId;
@@ -230,6 +238,10 @@ export const paymentService = {
       const payment = await Payment.findOne({ order: orderId, gateway: 'bank_transfer' });
       if (!payment) {
         throw new NotFoundError('Bank transfer payment record not found');
+      }
+
+      if (userRole !== 'admin' && userId && payment.user.toString() !== userId.toString()) {
+        throw new BadRequestError('Unauthorized to submit details for this payment');
       }
 
       payment.bankTransferDetails = {
