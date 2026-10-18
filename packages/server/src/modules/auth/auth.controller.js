@@ -1,6 +1,17 @@
 import { AuthService } from './auth.service.js';
 import { registerSchema, loginSchema } from '@marketplace/shared';
 import { ValidationError } from '../../utils/errors.js';
+import { z } from 'zod';
+
+const forgotPasswordSchema = z.object({
+  email: z.string().email('Invalid email address'),
+});
+
+const resetPasswordSchema = z.object({
+  email: z.string().email('Invalid email address'),
+  token: z.string().min(1, 'Token is required'),
+  newPassword: z.string().min(8, 'Password must be at least 8 characters'),
+});
 
 export class AuthController {
   static async register(req, res, next) {
@@ -122,6 +133,35 @@ export class AuthController {
           },
         },
       });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async forgotPassword(req, res, next) {
+    try {
+      const result = forgotPasswordSchema.safeParse(req.body);
+      if (!result.success) {
+        throw new ValidationError('Validation failed', result.error.errors);
+      }
+
+      const response = await AuthService.forgotPassword(result.data.email);
+      res.status(200).json({ status: 'success', ...response });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async resetPassword(req, res, next) {
+    try {
+      const result = resetPasswordSchema.safeParse(req.body);
+      if (!result.success) {
+        throw new ValidationError('Validation failed', result.error.errors);
+      }
+
+      const { email, token, newPassword } = result.data;
+      const response = await AuthService.resetPassword(email, token, newPassword);
+      res.status(200).json({ status: 'success', ...response });
     } catch (error) {
       next(error);
     }

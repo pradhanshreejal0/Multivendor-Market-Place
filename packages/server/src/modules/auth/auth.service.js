@@ -1,6 +1,8 @@
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 import { User } from './user.model.js';
 import { ConflictError, UnauthorizedError, BadRequestError } from '../../utils/errors.js';
+import { sendEmail } from '../../utils/mailer.js';
 
 export class AuthService {
   static generateAccessToken(user) {
@@ -50,6 +52,14 @@ export class AuthService {
     user.refreshToken = refreshToken;
     await user.save();
 
+    // Send welcome email
+    await sendEmail({
+      to: user.email,
+      subject: 'Welcome to ZenithBazaar!',
+      html: `<h2>Welcome, ${profile.firstName}!</h2><p>Your account has been successfully created on ZenithBazaar. Start exploring products and managing your orders today.</p>`,
+      text: `Welcome, ${profile.firstName}! Your account has been successfully created on ZenithBazaar.`,
+    });
+
     return {
       user: {
         id: user._id,
@@ -71,9 +81,27 @@ export class AuthService {
       throw new UnauthorizedError('Invalid email or password');
     }
 
+    // Check account lockout
+    if (user.isLocked) {
+      const remainingTime = Math.ceil((user.lockUntil - Date.now()) / 1000 / 60);
+      throw new UnauthorizedError(`Account is temporarily locked due to multiple failed login attempts. Try again in ${remainingTime} minutes.`);
+    }
+
     const isPasswordValid = await user.comparePassword(password);
     if (!isPasswordValid) {
+      user.loginAttempts = (user.loginAttempts || 0) + 1;
+      if (user.loginAttempts >= 5) {
+        user.lockUntil = Date.now() + 15 * 60 * 1000; // Lock for 15 minutes
+      }
+      await user.save();
       throw new UnauthorizedError('Invalid email or password');
+    }
+
+    // Reset login attempts on successful login
+    if (user.loginAttempts > 0 || user.lockUntil) {
+      user.loginAttempts = 0;
+      user.lockUntil = undefined;
+      await user.save();
     }
 
     const accessToken = this.generateAccessToken(user);
@@ -128,5 +156,59 @@ export class AuthService {
   static async logout(userId) {
     await User.findByIdAndUpdate(userId, { $unset: { refreshToken: 1 } });
     return true;
+  }
+
+  static async forgotPassword(email) {
+    const user = await User.findOne({ email });
+    if (!user) {
+      // Return success silently for security to prevent email enumeration
+      return { message: 'If the email exists, a password reset link has been sent.' };
+    }
+
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    user.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+    user.passwordResetExpires = Date.now() + 30 * 60 * 1000; // 30 minutes
+    await user.save();
+
+    const resetUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}/reset-password?token=${resetToken}&email=${email}`;
+
+    await sendEmail({
+      to: user.email,
+      subject: 'Password Reset Request - ZenithBazaar',
+      html: `<h2>Password Reset</h2><p>You requested a password reset. Click the link below to reset your password (valid for 30 minutes):</p><a href="${resetUrl}">${resetUrl}</a><p>If you didn't request this, please ignore this email.</p>`,
+      text: `Password Reset Request: ${resetUrl}`,
+    });
+
+    return { message: 'If the email exists, a password reset link has been sent.' };
+  }
+
+  static async resetPassword(email, token, newPassword) {
+    const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+
+    const user = await User.findOne({
+      email,
+      passwordResetToken: hashedToken,
+      passwordResetExpires: { $gt: Date.now() },
+    }).select('+passwordResetToken +passwordResetExpires');
+
+    if (!user) {
+      throw new BadRequestError('Invalid or expired password reset token');
+    }
+
+    user.password = newPassword;
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+    user.loginAttempts = 0;
+    user.lockUntil = undefined;
+    await user.save();
+
+    await sendEmail({
+      to: user.email,
+      subject: 'Password Successfully Reset - ZenithBazaar',
+      html: `<h2>Password Reset Successful</h2><p>Your ZenithBazaar account password has been successfully reset.</p>`,
+      text: `Your ZenithBazaar account password has been successfully reset.`,
+    });
+
+    return { message: 'Password reset successful' };
   }
 }
