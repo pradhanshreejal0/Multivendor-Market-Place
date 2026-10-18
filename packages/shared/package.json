@@ -1,0 +1,13 @@
+{
+  "name": "@marketplace/shared",
+  "version": "1.0.0",
+  "private": true,
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "test": "node --test"
+  },
+  "dependencies": {
+    "zod": "^3.22.4"
+  }
+}
