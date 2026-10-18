@@ -8,6 +8,7 @@ import { connectDB } from './config/db.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { NotFoundError } from './utils/errors.js';
 import { authRoutes } from './modules/auth/auth.routes.js';
+import { productRoutes } from './modules/products/product.routes.js';
 
 dotenv.config();
 
@@ -38,6 +39,7 @@ app.get('/health', (req, res) => {
 
 // API Routes
 app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/products', productRoutes);
 
 // Handle undefined routes
 app.all('*', (req, res, next) => {
