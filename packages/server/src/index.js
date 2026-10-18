@@ -10,6 +10,8 @@ import { NotFoundError } from './utils/errors.js';
 import { authRoutes } from './modules/auth/auth.routes.js';
 import { productRoutes } from './modules/products/product.routes.js';
 import { cartRoutes } from './modules/cart/cart.routes.js';
+import { orderRoutes } from './modules/orders/order.routes.js';
+import { paymentRoutes } from './modules/payments/payment.routes.js';
 
 dotenv.config();
 
@@ -42,6 +44,9 @@ app.get('/health', (req, res) => {
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/products', productRoutes);
 app.use('/api/v1/cart', cartRoutes);
+app.use('/api/v1/checkout', orderRoutes);
+app.use('/api/v1/orders', orderRoutes);
+app.use('/api/v1/payments', paymentRoutes);
 app.use('/api/v1/categories', (req, res, next) => {
   req.url = '/categories';
   return productRoutes(req, res, next);
