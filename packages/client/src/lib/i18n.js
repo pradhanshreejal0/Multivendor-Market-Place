@@ -5,7 +5,7 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 const resources = {
   en: {
     translation: {
-      welcome: "Welcome to E-Commerce Marketplace",
+      welcome: "Welcome to ZenithBazaar",
       login: "Login",
       register: "Register",
       logout: "Logout",
@@ -21,7 +21,7 @@ const resources = {
   },
   ne: {
     translation: {
-      welcome: "ई-कमर्स बजारमा स्वागत छ",
+      welcome: "ZenithBazaar मा स्वागत छ",
       login: "लगइन",
       register: "दर्ता गर्नुहोस्",
       logout: "लगआउट",
