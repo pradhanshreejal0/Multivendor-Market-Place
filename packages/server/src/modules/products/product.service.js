@@ -90,7 +90,9 @@ export class ProductService {
     }
 
     if (category) {
-      query['category.en'] = new RegExp(category, 'i');
+      // Escape regex special chars to prevent ReDoS
+      const escapedCategory = category.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      query['category.en'] = new RegExp(escapedCategory, 'i');
     }
 
     if (vendor) {
