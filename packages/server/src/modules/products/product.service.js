@@ -65,6 +65,11 @@ export class ProductService {
     return product;
   }
 
+  static async getCategories() {
+    const categories = await Product.distinct('category', { status: 'approved' });
+    return categories;
+  }
+
   static async getProducts(queryObj) {
     const {
       page = 1,

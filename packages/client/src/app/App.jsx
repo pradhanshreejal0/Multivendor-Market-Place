@@ -4,6 +4,9 @@ import { useTranslation } from 'react-i18next';
 import VendorLayout from '../features/vendor/VendorLayout';
 import ProductList from '../features/vendor/products/ProductList';
 import ProductForm from '../features/vendor/products/ProductForm';
+import ProductListing from '../features/storefront/catalog/ProductListing';
+import ProductDetail from '../features/storefront/catalog/ProductDetail';
+import SearchResults from '../features/storefront/catalog/SearchResults';
 
 function Home() {
   const { t, i18n } = useTranslation();
@@ -25,6 +28,7 @@ function Home() {
             >
               {i18n.language === 'en' ? 'नेपाली' : 'English'}
             </button>
+            <Link to="/products" className="text-blue-600 hover:underline font-medium">{t('products')}</Link>
             <Link to="/login" className="text-blue-600 hover:underline">{t('login')}</Link>
             <Link to="/vendor/products" className="text-blue-600 hover:underline font-medium">Vendor Portal</Link>
           </div>
@@ -33,12 +37,18 @@ function Home() {
       <main className="max-w-7xl mx-auto px-4 py-12 text-center">
         <h2 className="text-4xl font-extrabold text-gray-900 mb-4">{t('welcome')}</h2>
         <p className="text-lg text-gray-600">Single currency: {t('currency')} | Bilingual: English & Nepali</p>
-        <div className="mt-8">
+        <div className="mt-8 flex justify-center space-x-4">
           <Link
-            to="/vendor/products"
+            to="/products"
             className="inline-block bg-blue-600 text-white font-medium px-6 py-3 rounded-lg shadow hover:bg-blue-700 transition"
           >
-            Go to Vendor Product Management
+            Browse Storefront Catalog
+          </Link>
+          <Link
+            to="/vendor/products"
+            className="inline-block bg-gray-900 text-white font-medium px-6 py-3 rounded-lg shadow hover:bg-gray-800 transition"
+          >
+            Vendor Product Management
           </Link>
         </div>
       </main>
@@ -58,6 +68,9 @@ function Login() {
         <p className="text-center text-gray-500 mb-4">Login form placeholder / Authentication</p>
         <div className="space-y-4">
           <div className="text-center">
+            <Link to="/products" className="text-blue-600 hover:underline font-medium">Go to Storefront Products</Link>
+          </div>
+          <div className="text-center">
             <Link to="/vendor/products" className="text-blue-600 hover:underline font-medium">Bypass to Vendor Products (Dev Mode)</Link>
           </div>
           <div className="text-center">
@@ -75,6 +88,11 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
+
+        {/* Storefront Catalog & Search Routes */}
+        <Route path="/products" element={<ProductListing />} />
+        <Route path="/products/:id" element={<ProductDetail />} />
+        <Route path="/search" element={<SearchResults />} />
 
         {/* Vendor Routes */}
         <Route path="/vendor" element={<VendorLayout />}>

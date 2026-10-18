@@ -40,6 +40,10 @@ app.get('/health', (req, res) => {
 // API Routes
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/products', productRoutes);
+app.use('/api/v1/categories', (req, res, next) => {
+  req.url = '/categories';
+  return productRoutes(req, res, next);
+});
 
 // Handle undefined routes
 app.all('*', (req, res, next) => {

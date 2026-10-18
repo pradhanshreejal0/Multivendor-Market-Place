@@ -6,6 +6,7 @@ const router = Router();
 
 // Public routes
 router.get('/', ProductController.getProducts);
+router.get('/categories', ProductController.getCategories);
 router.get('/:id', ProductController.getProductById);
 
 // Vendor routes

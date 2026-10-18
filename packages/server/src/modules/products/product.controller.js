@@ -13,6 +13,19 @@ export class ProductController {
     }
   }
 
+  static async getCategories(req, res, next) {
+    try {
+      const categories = await ProductService.getCategories();
+      res.status(200).json({
+        status: 'success',
+        results: categories.length,
+        data: { categories },
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   static async getProducts(req, res, next) {
     try {
       // If vendor is requesting their own products or admin requesting all with status
