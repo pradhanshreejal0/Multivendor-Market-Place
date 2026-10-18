@@ -6,7 +6,10 @@ import { sendEmail } from '../../utils/mailer.js';
 
 export class AuthService {
   static generateAccessToken(user) {
-    const secret = process.env.JWT_ACCESS_SECRET || 'access_secret_key_change_in_production';
+    const secret = process.env.JWT_ACCESS_SECRET;
+    if (!secret) {
+      throw new Error('JWT_ACCESS_SECRET environment variable is not defined');
+    }
     const expiresIn = process.env.JWT_ACCESS_EXPIRES_IN || '15m';
     return jwt.sign(
       {
@@ -20,7 +23,10 @@ export class AuthService {
   }
 
   static generateRefreshToken(user) {
-    const secret = process.env.JWT_REFRESH_SECRET || 'refresh_secret_key_change_in_production';
+    const secret = process.env.JWT_REFRESH_SECRET;
+    if (!secret) {
+      throw new Error('JWT_REFRESH_SECRET environment variable is not defined');
+    }
     const expiresIn = process.env.JWT_REFRESH_EXPIRES_IN || '7d';
     return jwt.sign(
       {
@@ -128,7 +134,11 @@ export class AuthService {
       throw new UnauthorizedError('Refresh token is required');
     }
 
-    const secret = process.env.JWT_REFRESH_SECRET || 'refresh_secret_key_change_in_production';
+    const secret = process.env.JWT_REFRESH_SECRET;
+    if (!secret) {
+      throw new Error('JWT_REFRESH_SECRET environment variable is not defined');
+    }
+
     let decoded;
     try {
       decoded = jwt.verify(incomingRefreshToken, secret);
