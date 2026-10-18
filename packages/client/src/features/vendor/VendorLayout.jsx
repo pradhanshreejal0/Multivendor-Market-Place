@@ -3,14 +3,9 @@ import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 export default function VendorLayout() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
-
-  const toggleLanguage = () => {
-    const newLang = i18n.language === 'en' ? 'ne' : 'en';
-    i18n.changeLanguage(newLang);
-  };
 
   const handleLogout = () => {
     localStorage.removeItem('accessToken');
@@ -33,12 +28,6 @@ export default function VendorLayout() {
           </div>
           <div className="flex items-center space-x-4">
             <button
-              onClick={toggleLanguage}
-              className="px-3 py-1 border border-gray-300 rounded text-sm font-medium text-gray-700 hover:bg-gray-50 transition"
-            >
-              {i18n.language === 'en' ? 'नेपाली' : 'English'}
-            </button>
-            <button
               onClick={handleLogout}
               className="text-sm font-medium text-red-600 hover:text-red-800 transition"
             >
@@ -53,7 +42,7 @@ export default function VendorLayout() {
         {/* Sidebar */}
         <aside className="w-64 bg-white border-r border-gray-200 hidden md:block p-4 space-y-2">
           <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 px-3">
-            {t('management') || 'Management'}
+            Management
           </div>
           <Link
             to="/vendor/products"
@@ -66,7 +55,7 @@ export default function VendorLayout() {
             <svg className="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
             </svg>
-            {t('products') || 'Products'}
+            Products
           </Link>
           <Link
             to="/vendor/orders"
@@ -79,7 +68,20 @@ export default function VendorLayout() {
             <svg className="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
             </svg>
-            {t('orders') || 'Orders'}
+            Orders Fulfillment
+          </Link>
+          <Link
+            to="/vendor/reports"
+            className={`flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition ${
+              isActive('/vendor/reports')
+                ? 'bg-blue-50 text-blue-700'
+                : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
+            }`}
+          >
+            <svg className="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+            Sales Reports
           </Link>
         </aside>
 

@@ -18,22 +18,6 @@ const resources = {
       adminPanel: "Admin Panel",
       vendorPanel: "Vendor Panel"
     }
-  },
-  ne: {
-    translation: {
-      welcome: "ZenithBazaar मा स्वागत छ",
-      login: "लगइन",
-      register: "दर्ता गर्नुहोस्",
-      logout: "लगआउट",
-      dashboard: "ड्यासबोर्ड",
-      currency: "रु",
-      profile: "प्रोफाइल",
-      cart: "कार्ट",
-      products: "उत्पादनहरू",
-      orders: "अर्डरहरू",
-      adminPanel: "प्रशासन प्यानल",
-      vendorPanel: "विक्रेता प्यानल"
-    }
   }
 };
 
@@ -42,6 +26,7 @@ i18n
   .use(initReactI18next)
   .init({
     resources,
+    lng: 'en',
     fallbackLng: 'en',
     interpolation: {
       escapeValue: false
