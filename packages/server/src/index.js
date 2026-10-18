@@ -9,6 +9,7 @@ import { errorHandler } from './middleware/errorHandler.js';
 import { NotFoundError } from './utils/errors.js';
 import { authRoutes } from './modules/auth/auth.routes.js';
 import { productRoutes } from './modules/products/product.routes.js';
+import { cartRoutes } from './modules/cart/cart.routes.js';
 
 dotenv.config();
 
@@ -40,6 +41,7 @@ app.get('/health', (req, res) => {
 // API Routes
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/products', productRoutes);
+app.use('/api/v1/cart', cartRoutes);
 app.use('/api/v1/categories', (req, res, next) => {
   req.url = '/categories';
   return productRoutes(req, res, next);
